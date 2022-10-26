@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Position;
 use App\Form\PositionType;
-use Exception;
 use App\Repository\PositionRepository;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,15 +36,15 @@ function new (Request $request, PositionRepository $positionRepository): JsonRes
         $position->setName($parameters["name"]);
         $position->setSalary($parameters["salary"]);
         $position->setCountry($parameters["country"]);
-        //$positionRepository->save($position, true);
-
+        $positionRepository->save($position, true);
+        to be continue here name is unique and refuse as new
         //var_dump($position);
 
         $response = new JsonResponse(['result' => "OK"]);
         return $response;
     } catch (Exception $e) {
         //$retVal = $this->exceptionError($request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace());
-        $response = new JsonResponse(['result' => $e->getMessage()],400);
+        $response = new JsonResponse(['result' => $e->getMessage()], 400);
         return $response;
     }
 } //new

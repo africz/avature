@@ -18,9 +18,9 @@ class PositionControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->repository = static::getContainer()->get('doctrine')->getRepository(Position::class);
 
-        foreach ($this->repository->findAll() as $object) {
-            $this->repository->remove($object, true);
-        }
+        // foreach ($this->repository->findAll() as $object) {
+        //     $this->repository->remove($object, true);
+        // }
     }
 
     function new ($requestData): string {
@@ -33,9 +33,6 @@ class PositionControllerTest extends WebTestCase
             'body' => $requestJson,
         ]);
         return $this->client->getResponse()->getContent();
-        // $response=$this->client->getResponse()->getContent();
-        // self::assertResponseStatusCodeSame(200);
-        // self::assertSame('{"result":"OK"}', $response);
     }
 
     public function testNewOK(): void
