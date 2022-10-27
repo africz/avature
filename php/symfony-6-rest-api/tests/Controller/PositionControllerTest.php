@@ -33,6 +33,18 @@ class PositionControllerTest extends WebTestCase {
         return $this->client->getResponse()->getContent();
     }
 
+    function put ( $requestData ): string {
+        $requestJson = json_encode( $requestData, JSON_THROW_ON_ERROR );
+        $this->client->request( 'PUT', sprintf( '%supdate', $this->path ), [
+            'headers' => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+            ],
+            'body' => $requestJson,
+        ] );
+        return $this->client->getResponse()->getContent();
+    }
+
     public function testNewOK(): void {
         $found = true;
         $baseName = 'PHP';
@@ -80,11 +92,26 @@ class PositionControllerTest extends WebTestCase {
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Undefined array key \u0022skills\u0022"}', $response );
     }
+    
     public function testNewSkillsEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => 'Hungary','skills'=>[] ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Skills are empty!"}', $response );
+    }
+
+    public function testPut(): void {
+        $requestData = [ 'id'=>11,'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'javascript', 'node' ] ];
+        $response = $this->put( $requestData );
+        self::assertResponseStatusCodeSame( 200 );
+        self::assertSame( '{"id":'.$requestData['id'].',"name":"'.$requestData['name'].'"}', $response );
+    }
+    
+    public function testPutNotFound(): void {
+        $requestData = [ 'id'=>7,'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
+        $response = $this->put( $requestData );
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"Id:'.$requestData['id'].' not found!"}', $response );
     }
 
 }

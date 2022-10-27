@@ -53,9 +53,9 @@ class PositionController extends AbstractController {
             }
             $entityManager->persist( $position );
             $entityManager->flush();
-            $positionRepository->save( $position, true );
+            //$positionRepository->save( $position, true );
             //var_dump( $position );
-            $retVal = [ 'id'=>$position->getId(), 'name'=>$position->getName(), 'salary'=>$position->getSalary(), 'country'=>$position->getCountry() ];
+            $retVal = [ 'id'=>$position->getId(), 'name'=>$position->getName() ];
             $response = new JsonResponse( $retVal, 201 );
             //created
             return $response;
@@ -67,31 +67,28 @@ class PositionController extends AbstractController {
     }
     //new
 
-    #[ Route( '/update', name:'app_position_update', methods:'PUT' ) ]
+    #[ Route( '/update', name:'app_position_update', methods:[ 'PUT', 'PATCH' ] ) ]
 
-    function update ( Request $request, PositionRepository $positionRepository ): JsonResponse {
+    function update ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
         try {
+            $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
-            var_dump( $parameters );
-            if ( empty( $parameters[ 'name' ] ) ) {
-                throw new Exception( 'Name is empty!' );
+            $position = $positionRepository->findOneBy( [ 'id'=>$parameters[ 'id' ] ] );
+            if ( empty( $position ) ) {
+                throw new Exception( 'Id:'.$parameters['id'].' not found!' );
             }
-            if ( empty( $parameters[ 'salary' ] ) ) {
-                throw new Exception( 'Salary is empty!' );
+            if ( $request->isMethod( 'PUT' ) ) {
+                $uPosition = $this->put( $parameters, $position, $entityManager );
             }
-            if ( empty( $parameters[ 'country' ] ) ) {
-                throw new Exception( 'Country is empty!' );
-            }
+            if ( $request->isMethod( 'PATCH' ) ) {
+                $this->patch( $parameters );
 
-            $position = new Position();
-            $position->setName( $parameters[ 'name' ] );
-            $position->setSalary( $parameters[ 'salary' ] );
-            $position->setCountry( $parameters[ 'country' ] );
-            $positionRepository->save( $position, true );
+            }
             //var_dump( $position );
-            $retVal = [ 'id'=>$position->getId(), 'name'=>$position->getName(), 'salary'=>$position->getSalary(), 'country'=>$position->getCountry() ];
-            $response = new JsonResponse( $retVal );
+            $retVal = [ 'id'=>$uPosition->getId(), 'name'=>$uPosition->getName() ];
+            $response = new JsonResponse( $retVal, 200 );
+            //created
             return $response;
         } catch ( Exception $e ) {
             //$retVal = $this->exceptionError( $request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace() );
@@ -99,33 +96,38 @@ class PositionController extends AbstractController {
             return $response;
         }
     }
-    //new
 
-    #[ Route( '/{id}/edit', name:'app_position_edit', methods:[ 'GET', 'POST' ] ) ]
-
-    function edit( Request $request, Position $position, PositionRepository $positionRepository ): Response {
-        $form = $this->createForm( PositionType::class, $position );
-        $form->handleRequest( $request );
-
-        if ( $form->isSubmitted() && $form->isValid() ) {
-            $positionRepository->save( $position, true );
-
-            return $this->redirectToRoute( 'app_position_index', [], Response::HTTP_SEE_OTHER );
+    function put( $parameters, $position, $entityManager ) {
+        if ( empty( $parameters[ 'name' ] ) ) {
+            throw new Exception( 'Name is empty!' );
         }
+        if ( empty( $parameters[ 'salary' ] ) ) {
+            throw new Exception( 'Salary is empty!' );
+        }
+        if ( empty( $parameters[ 'country' ] ) ) {
+            throw new Exception( 'Country is empty!' );
+        }
+        if ( !count( $parameters[ 'skills' ] ) ) {
+            throw new Exception( 'Skills are empty!' );
+        }
+        //var_dump( $parameters );
+        $position->setName( $parameters[ 'name' ] );
+        $position->setSalary( $parameters[ 'salary' ] );
+        $position->setCountry( $parameters[ 'country' ] );
+        foreach ( $parameters[ 'skills' ] as $skill_name ) {
+            $skills = new Skills();
+            $skills->setName( $skill_name );
+            $position->addSkill( $skills );
+            $entityManager->persist( $skills );
 
-        return $this->renderForm( 'position/edit.html.twig', [
-            'position' => $position,
-            'form' => $form,
-        ] );
+        }
+        $entityManager->persist( $position );
+        $entityManager->flush();
+        return $position;
     }
 
-    #[ Route( '/{id}', name:'app_position_delete', methods:[ 'POST' ] ) ]
+    function patch( $parameters ) {
 
-    function delete( Request $request, Position $position, PositionRepository $positionRepository ): Response {
-        if ( $this->isCsrfTokenValid( 'delete' . $position->getId(), $request->request->get( '_token' ) ) ) {
-            $positionRepository->remove( $position, true );
-        }
-
-        return $this->redirectToRoute( 'app_position_index', [], Response::HTTP_SEE_OTHER );
     }
+
 }

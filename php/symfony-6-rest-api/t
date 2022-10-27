@@ -1,2 +1,2 @@
 clear
-php bin/phpunit --filter testNew
+php bin/phpunit --filter testPut 
