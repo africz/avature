@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Position;
-use App\Form\PositionType;
+use App\Entity\Skills;
 use App\Repository\PositionRepository;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Persistence\ManagerRegistry;
 
 #[ Route( '/position' ) ]
 
@@ -18,9 +19,11 @@ class PositionController extends AbstractController {
 
     #[ Route( '/new', name:'app_position_new', methods:'POST' ) ]
 
-    function new ( Request $request, PositionRepository $positionRepository ): JsonResponse {
+    function new ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
         try {
+            $entityManager = $doctrine->getManager();
+
             $parameters = json_decode( $request->get( 'body' ), true );
             //var_dump( $parameters );
             if ( empty( $parameters[ 'name' ] ) ) {
@@ -32,11 +35,55 @@ class PositionController extends AbstractController {
             if ( empty( $parameters[ 'country' ] ) ) {
                 throw new Exception( 'Country is empty!' );
             }
-
-            $name = $positionRepository->findOneBy( [ 'name' => $parameters[ 'name' ] ] );
-            if ( !empty( $name ) ) {
-                throw new Exception( 'Name is exists!' );
+            if ( !count( $parameters[ 'skills' ] ) ) {
+                throw new Exception( 'Skills are empty!' );
             }
+
+            $position = new Position();
+
+            $position->setName( $parameters[ 'name' ] );
+            $position->setSalary( $parameters[ 'salary' ] );
+            $position->setCountry( $parameters[ 'country' ] );
+            foreach ( $parameters[ 'skills' ] as $skill_name ) {
+                $skills = new Skills();
+                $skills->setName( $skill_name );
+                $position->addSkill( $skills );
+                $entityManager->persist( $skills );
+
+            }
+            $entityManager->persist( $position );
+            $entityManager->flush();
+            $positionRepository->save( $position, true );
+            //var_dump( $position );
+            $retVal = [ 'id'=>$position->getId(), 'name'=>$position->getName(), 'salary'=>$position->getSalary(), 'country'=>$position->getCountry() ];
+            $response = new JsonResponse( $retVal, 201 );
+            //created
+            return $response;
+        } catch ( Exception $e ) {
+            //$retVal = $this->exceptionError( $request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace() );
+            $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            return $response;
+        }
+    }
+    //new
+
+    #[ Route( '/update', name:'app_position_update', methods:'PUT' ) ]
+
+    function update ( Request $request, PositionRepository $positionRepository ): JsonResponse {
+        $response = null;
+        try {
+            $parameters = json_decode( $request->get( 'body' ), true );
+            var_dump( $parameters );
+            if ( empty( $parameters[ 'name' ] ) ) {
+                throw new Exception( 'Name is empty!' );
+            }
+            if ( empty( $parameters[ 'salary' ] ) ) {
+                throw new Exception( 'Salary is empty!' );
+            }
+            if ( empty( $parameters[ 'country' ] ) ) {
+                throw new Exception( 'Country is empty!' );
+            }
+
             $position = new Position();
             $position->setName( $parameters[ 'name' ] );
             $position->setSalary( $parameters[ 'salary' ] );

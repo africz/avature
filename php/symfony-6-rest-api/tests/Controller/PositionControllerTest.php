@@ -46,32 +46,45 @@ class PositionControllerTest extends WebTestCase {
             }
         }
 
-        $requestData = [ 'name' => $name, 'salary' => '5000', 'country' => 'Hungary' ];
+        $requestData = [ 'name' => $name, 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
         $response = json_decode( $this->new( $requestData ), true );
 
-        self::assertResponseStatusCodeSame( 200 );
-        self::assertSame( $requestData['name'], $response['name'] );
+        self::assertResponseStatusCodeSame( 201 );
+        self::assertSame( $requestData[ 'name' ], $response[ 'name' ] );
     }
 
-    public function testNewNameError(): void {
+    public function testNewNameEmpty(): void {
         $requestData = [ 'name' => '', 'salary' => '5000', 'country' => 'Hungary' ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Name is empty!"}', $response );
     }
 
-    public function testNewSalaryError(): void {
+    public function testNewSalaryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '', 'country' => 'Hungary' ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Salary is empty!"}', $response );
     }
 
-    public function testNewCountryError(): void {
+    public function testNewCountryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => '' ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Country is empty!"}', $response );
+    }
+
+    public function testNewNoSkills(): void {
+        $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => 'Hungary' ];
+        $response = $this->new( $requestData );
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"Undefined array key \u0022skills\u0022"}', $response );
+    }
+    public function testNewSkillsEmpty(): void {
+        $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => 'Hungary','skills'=>[] ];
+        $response = $this->new( $requestData );
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"Skills are empty!"}', $response );
     }
 
 }
