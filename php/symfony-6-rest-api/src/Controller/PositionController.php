@@ -108,24 +108,23 @@ class PositionController extends AbstractController {
         $position->setSalary( $parameters[ 'salary' ] );
         $position->setCountry( $parameters[ 'country' ] );
         $oldSkills = $position->getSkills();
-            foreach ( $parameters[ 'skills' ] as $skill_name ) {
-                $found=false;
-                for ( $i = 0; $i<count( $oldSkills );$i++ ) {
-                    if ($skill_name===$oldSkills[$i]->getName())
-                    {
-                        $found=true;
-                        break;
-                    }
-                }
-                if (!$found)
-                {
-                    $skills = new Skills();
-                    $skills->setName( $skill_name );
-                    $position->addSkill( $skills );
-                    $entityManager->persist( $skills );
-    
+        foreach ( $parameters[ 'skills' ] as $skill_name ) {
+            $found = false;
+            for ( $i = 0; $i<count( $oldSkills );
+            $i++ ) {
+                if ( $skill_name === $oldSkills[ $i ]->getName() ) {
+                    $found = true;
+                    break;
                 }
             }
+            if ( !$found ) {
+                $skills = new Skills();
+                $skills->setName( $skill_name );
+                $position->addSkill( $skills );
+                $entityManager->persist( $skills );
+
+            }
+        }
         $entityManager->persist( $position );
         $entityManager->flush();
         return $position;
@@ -146,17 +145,27 @@ class PositionController extends AbstractController {
             $position->setName( $parameters[ 'country' ] );
         }
         if ( !empty( $parameters[ 'skills' ] )  && count( $parameters[ 'skills' ] ) ) {
+            $oldSkills = $position->getSkills();
             foreach ( $parameters[ 'skills' ] as $skill_name ) {
-                $skills = new Skills();
-                $skills->setName( $skill_name );
-                $position->addSkill( $skills );
-                $entityManager->persist( $skills );
+                $found = false;
+                for ( $i = 0; $i<count( $oldSkills );
+                $i++ ) {
+                    if ( $skill_name === $oldSkills[ $i ]->getName() ) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ( !$found ) {
+                    $skills = new Skills();
+                    $skills->setName( $skill_name );
+                    $position->addSkill( $skills );
+                    $entityManager->persist( $skills );
 
+                }
             }
         }
         $entityManager->persist( $position );
         $entityManager->flush();
         return $position;
     }
-
 }

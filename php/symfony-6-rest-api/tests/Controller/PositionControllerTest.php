@@ -103,12 +103,12 @@ class PositionControllerTest extends WebTestCase {
         self::assertSame( '{"error":"Id:'.$requestData[ 'id' ].' not found!"}', $response );
     }
 
-    //  public function testPatch(): void {
-    //      $requestData = [ 'id'=>89, 'name'=>'patchooo'];
-    //      $response = $this->call( $requestData,"PATCH","update" );
-    //      self::assertResponseStatusCodeSame( 200 );
-    //      self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
-    //  }
+     public function testPatch(): void {
+         $requestData = [ 'id'=>89, 'name'=>'patchooo'];
+         $response = $this->call( $requestData,"PATCH","update" );
+         self::assertResponseStatusCodeSame( 200 );
+         self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
+     }
 
 
 }
