@@ -55,8 +55,7 @@ class PositionController extends AbstractController {
                 $newPosition = $this->insert( $parameters, $position, $entityManager );
             }
             if ( $request->isMethod( 'PATCH' ) ) {
-                $this->patch( $parameters );
-
+                $newPosition = $this->patch( $parameters, $position, $entityManager );
             }
             //var_dump( $position );
             $retVal = [ 'id'=>$newPosition->getId(), 'name'=>$newPosition->getName() ];
@@ -102,6 +101,25 @@ class PositionController extends AbstractController {
     }
 
     function patch( $parameters ) {
+        //var_dump( $parameters );
+        if (!count( $parameters) ) {
+            throw new Exception( PARAMETERS_ARE_EMPTY );
+        }
+
+        //var_dump( $parameters );
+        $position->setName( $parameters[ 'name' ] );
+        $position->setSalary( $parameters[ 'salary' ] );
+        $position->setCountry( $parameters[ 'country' ] );
+        foreach ( $parameters[ 'skills' ] as $skill_name ) {
+            $skills = new Skills();
+            $skills->setName( $skill_name );
+            $position->addSkill( $skills );
+            $entityManager->persist( $skills );
+
+        }
+        $entityManager->persist( $position );
+        $entityManager->flush();
+        return $position;
 
     }
 
