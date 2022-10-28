@@ -69,21 +69,21 @@ class PositionControllerTest extends WebTestCase {
         $requestData = [ 'name' => '', 'salary' => '5000', 'country' => 'Hungary' ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"Name is empty!"}', $response );
+        self::assertSame( '{"error":"'.NAME_IS_EMPTY.'"}', $response );
     }
 
     public function testNewSalaryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '', 'country' => 'Hungary' ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"Salary is empty!"}', $response );
+        self::assertSame( '{"error":"'.SALARY_IS_EMPTY.'"}', $response );
     }
 
     public function testNewCountryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => '' ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"Country is empty!"}', $response );
+        self::assertSame( '{"error":"'.COUNTRY_IS_EMPTY.'"}', $response );
     }
 
     public function testNewNoSkills(): void {
@@ -92,26 +92,26 @@ class PositionControllerTest extends WebTestCase {
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Undefined array key \u0022skills\u0022"}', $response );
     }
-    
+
     public function testNewSkillsEmpty(): void {
-        $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => 'Hungary','skills'=>[] ];
+        $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[] ];
         $response = $this->new( $requestData );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"Skills are empty!"}', $response );
+        self::assertSame( '{"error":"'.SKILLS_ARE_EMPTY.'"}', $response );
     }
 
     public function testPut(): void {
-        $requestData = [ 'id'=>11,'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'javascript', 'node' ] ];
+        $requestData = [ 'id'=>11, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'javascript', 'node' ] ];
         $response = $this->put( $requestData );
         self::assertResponseStatusCodeSame( 200 );
-        self::assertSame( '{"id":'.$requestData['id'].',"name":"'.$requestData['name'].'"}', $response );
+        self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
     }
-    
+
     public function testPutNotFound(): void {
-        $requestData = [ 'id'=>7,'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
+        $requestData = [ 'id'=>7, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
         $response = $this->put( $requestData );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"Id:'.$requestData['id'].' not found!"}', $response );
+        self::assertSame( '{"error":"Id:'.$requestData[ 'id' ].' not found!"}', $response );
     }
 
 }

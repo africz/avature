@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 
+
 #[ Route( '/position' ) ]
 
 class PositionController extends AbstractController {
@@ -23,39 +24,11 @@ class PositionController extends AbstractController {
         $response = null;
         try {
             $entityManager = $doctrine->getManager();
-
             $parameters = json_decode( $request->get( 'body' ), true );
-            //var_dump( $parameters );
-            if ( empty( $parameters[ 'name' ] ) ) {
-                throw new Exception( 'Name is empty!' );
-            }
-            if ( empty( $parameters[ 'salary' ] ) ) {
-                throw new Exception( 'Salary is empty!' );
-            }
-            if ( empty( $parameters[ 'country' ] ) ) {
-                throw new Exception( 'Country is empty!' );
-            }
-            if ( !count( $parameters[ 'skills' ] ) ) {
-                throw new Exception( 'Skills are empty!' );
-            }
 
             $position = new Position();
-
-            $position->setName( $parameters[ 'name' ] );
-            $position->setSalary( $parameters[ 'salary' ] );
-            $position->setCountry( $parameters[ 'country' ] );
-            foreach ( $parameters[ 'skills' ] as $skill_name ) {
-                $skills = new Skills();
-                $skills->setName( $skill_name );
-                $position->addSkill( $skills );
-                $entityManager->persist( $skills );
-
-            }
-            $entityManager->persist( $position );
-            $entityManager->flush();
-            //$positionRepository->save( $position, true );
-            //var_dump( $position );
-            $retVal = [ 'id'=>$position->getId(), 'name'=>$position->getName() ];
+            $newPosition = $this->insert( $parameters, $position, $entityManager );
+            $retVal = [ 'id'=>$newPosition->getId(), 'name'=>$newPosition->getName() ];
             $response = new JsonResponse( $retVal, 201 );
             //created
             return $response;
@@ -76,17 +49,17 @@ class PositionController extends AbstractController {
             $parameters = json_decode( $request->get( 'body' ), true );
             $position = $positionRepository->findOneBy( [ 'id'=>$parameters[ 'id' ] ] );
             if ( empty( $position ) ) {
-                throw new Exception( 'Id:'.$parameters['id'].' not found!' );
+                throw new Exception( 'Id:'.$parameters[ 'id' ].' not found!' );
             }
             if ( $request->isMethod( 'PUT' ) ) {
-                $uPosition = $this->put( $parameters, $position, $entityManager );
+                $newPosition = $this->insert( $parameters, $position, $entityManager );
             }
             if ( $request->isMethod( 'PATCH' ) ) {
                 $this->patch( $parameters );
 
             }
             //var_dump( $position );
-            $retVal = [ 'id'=>$uPosition->getId(), 'name'=>$uPosition->getName() ];
+            $retVal = [ 'id'=>$newPosition->getId(), 'name'=>$newPosition->getName() ];
             $response = new JsonResponse( $retVal, 200 );
             //created
             return $response;
@@ -97,19 +70,21 @@ class PositionController extends AbstractController {
         }
     }
 
-    function put( $parameters, $position, $entityManager ) {
+    function insert( $parameters, $position, $entityManager ) {
+        //var_dump( $parameters );
         if ( empty( $parameters[ 'name' ] ) ) {
-            throw new Exception( 'Name is empty!' );
+            throw new Exception( NAME_IS_EMPTY );
         }
         if ( empty( $parameters[ 'salary' ] ) ) {
-            throw new Exception( 'Salary is empty!' );
+            throw new Exception( SALARY_IS_EMPTY );
         }
         if ( empty( $parameters[ 'country' ] ) ) {
-            throw new Exception( 'Country is empty!' );
+            throw new Exception( COUNTRY_IS_EMPTY );
         }
         if ( !count( $parameters[ 'skills' ] ) ) {
-            throw new Exception( 'Skills are empty!' );
+            throw new Exception( SKILLS_ARE_EMPTY );
         }
+
         //var_dump( $parameters );
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
