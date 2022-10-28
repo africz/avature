@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 
-
 #[ Route( '/position' ) ]
 
 class PositionController extends AbstractController {
@@ -52,7 +51,7 @@ class PositionController extends AbstractController {
                 throw new Exception( 'Id:'.$parameters[ 'id' ].' not found!' );
             }
             if ( $request->isMethod( 'PUT' ) ) {
-                $newPosition = $this->insert( $parameters, $position, $entityManager );
+                $newPosition = $this->put( $parameters, $position, $entityManager );
             }
             if ( $request->isMethod( 'PATCH' ) ) {
                 $newPosition = $this->patch( $parameters, $position, $entityManager );
@@ -69,7 +68,7 @@ class PositionController extends AbstractController {
         }
     }
 
-    function insert( $parameters, $position, $entityManager ) {
+    function verifyPosition( $parameters ) {
         //var_dump( $parameters );
         if ( empty( $parameters[ 'name' ] ) ) {
             throw new Exception( NAME_IS_EMPTY );
@@ -84,7 +83,10 @@ class PositionController extends AbstractController {
             throw new Exception( SKILLS_ARE_EMPTY );
         }
 
-        //var_dump( $parameters );
+    }
+
+    function insert( $parameters, $position, $entityManager ) {
+        $this->verifyPosition( $parameters );
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
         $position->setCountry( $parameters[ 'country' ] );
@@ -100,27 +102,61 @@ class PositionController extends AbstractController {
         return $position;
     }
 
-    function patch( $parameters ) {
-        //var_dump( $parameters );
-        if (!count( $parameters) ) {
-            throw new Exception( PARAMETERS_ARE_EMPTY );
-        }
-
-        //var_dump( $parameters );
+    function put( $parameters, $position, $entityManager ) {
+        $this->verifyPosition( $parameters );
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
         $position->setCountry( $parameters[ 'country' ] );
-        foreach ( $parameters[ 'skills' ] as $skill_name ) {
-            $skills = new Skills();
-            $skills->setName( $skill_name );
-            $position->addSkill( $skills );
-            $entityManager->persist( $skills );
+        $oldSkills = $position->getSkills();
+            foreach ( $parameters[ 'skills' ] as $skill_name ) {
+                $found=false;
+                for ( $i = 0; $i<count( $oldSkills );$i++ ) {
+                    if ($skill_name===$oldSkills[$i]->getName())
+                    {
+                        $found=true;
+                        break;
+                    }
+                }
+                if (!$found)
+                {
+                    $skills = new Skills();
+                    $skills->setName( $skill_name );
+                    $position->addSkill( $skills );
+                    $entityManager->persist( $skills );
+    
+                }
+            }
+        $entityManager->persist( $position );
+        $entityManager->flush();
+        return $position;
+    }
 
+    function patch( $parameters, $position, $entityManager ) {
+        //var_dump( $parameters );
+        if ( !count( $parameters ) ) {
+            throw new Exception( PARAMETERS_ARE_EMPTY );
+        }
+        if ( !empty( $parameters[ 'name' ] ) ) {
+            $position->setName( $parameters[ 'name' ] );
+        }
+        if ( !empty( $parameters[ 'salary' ] ) ) {
+            $position->setName( $parameters[ 'salary' ] );
+        }
+        if ( !empty( $parameters[ 'country' ] ) ) {
+            $position->setName( $parameters[ 'country' ] );
+        }
+        if ( !empty( $parameters[ 'skills' ] )  && count( $parameters[ 'skills' ] ) ) {
+            foreach ( $parameters[ 'skills' ] as $skill_name ) {
+                $skills = new Skills();
+                $skills->setName( $skill_name );
+                $position->addSkill( $skills );
+                $entityManager->persist( $skills );
+
+            }
         }
         $entityManager->persist( $position );
         $entityManager->flush();
         return $position;
-
     }
 
 }

@@ -16,9 +16,9 @@ class PositionControllerTest extends WebTestCase {
         $this->client = static::createClient();
         $this->repository = static::getContainer()->get( 'doctrine' )->getRepository( Position::class );
 
-        //  foreach ( $this->repository->findAll() as $object ) {
-        //      $this->repository->remove( $object, true );
-        //  }
+        //   foreach ( $this->repository->findAll() as $object ) {
+        //       $this->repository->remove( $object, true );
+        //   }
     }
 
 
@@ -90,7 +90,7 @@ class PositionControllerTest extends WebTestCase {
     }
 
     public function testPut(): void {
-        $requestData = [ 'id'=>11, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'javascript', 'node' ] ];
+        $requestData = [ 'id'=>89, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php1', 'javascript', 'node' ] ];
         $response = $this->call( $requestData,"PUT","update" );
         self::assertResponseStatusCodeSame( 200 );
         self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
@@ -103,12 +103,12 @@ class PositionControllerTest extends WebTestCase {
         self::assertSame( '{"error":"Id:'.$requestData[ 'id' ].' not found!"}', $response );
     }
 
-    // public function testPatch(): void {
-    //     $requestData = [ 'id'=>11, 'name'=>'xyz'];
-    //     $response = $this->call( $requestData,"PATCH","update" );
-    //     self::assertResponseStatusCodeSame( 200 );
-    //     self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
-    // }
+    //  public function testPatch(): void {
+    //      $requestData = [ 'id'=>89, 'name'=>'patchooo'];
+    //      $response = $this->call( $requestData,"PATCH","update" );
+    //      self::assertResponseStatusCodeSame( 200 );
+    //      self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
+    //  }
 
 
 }
