@@ -74,7 +74,7 @@ class SearchController extends AbstractController {
     }
 
     public function fetchPositions( $name, $positionRepository ) {
-        $result = $positionRepository->findByName( $name );
+        $result = $positionRepository->findByName( " ".$name." " );
         return $result;
     }
 

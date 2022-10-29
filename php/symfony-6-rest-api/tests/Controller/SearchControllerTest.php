@@ -41,7 +41,7 @@ class SearchControllerTest extends WebTestCase {
     public function testSearchBySingleName(): void {
         $requestData = [ 'name'=>[ 'java'] ];
         $response = $this->call( $requestData, 'POST', 'search' );
-        print_r($response);
+        // print_r($response);
         self::assertResponseStatusCodeSame( 200 );
     }
 
@@ -49,6 +49,7 @@ class SearchControllerTest extends WebTestCase {
     public function testSearchByMultiplyName(): void {
         $requestData = [ 'name'=>[ 'php', 'java', 'c++' ] ];
         $response = $this->call( $requestData, 'POST', 'search' );
+        //print_r($response);
         self::assertResponseStatusCodeSame( 200 );
     }
 
