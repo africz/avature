@@ -34,9 +34,17 @@ class SearchController extends AbstractController {
         try {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
+            
+            if ( !count( $parameters[ 'name' ] ) ) {
+                throw new Exception( NAME_IS_EMPTY );
+            }
 
             for ( $i = 0; $i<count( $parameters[ 'name' ] );
             $i++ ) {
+                if ( trim($parameters[ 'name' ][$i]==="")) {
+                    throw new Exception( NAME_IS_EMPTY );
+                }
+    
                 $result = $this->fetchExternalJobSource( $parameters[ 'name' ][ $i ] );
                 $this->externalContent = array_merge( $result, $this->externalContent );
             }
