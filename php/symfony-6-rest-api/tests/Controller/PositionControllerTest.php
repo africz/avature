@@ -12,6 +12,7 @@ class PositionControllerTest extends WebTestCase {
     private PositionRepository $repository;
     private $path = '/position/';
     private int $updateId=0;
+    private int $invalidId=99999999999;
 
     protected function setUp(): void {
         $this->client = static::createClient();
@@ -101,7 +102,7 @@ class PositionControllerTest extends WebTestCase {
     }
 
     public function testPutNotFound(): void {
-        $requestData = [ 'id'=>99999999999999, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
+        $requestData = [ 'id'=>$this->invalidId, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
         $response = $this->call( $requestData,"PUT","update" );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Id:'.$requestData[ 'id' ].' not found!"}', $response );
@@ -118,6 +119,20 @@ class PositionControllerTest extends WebTestCase {
         $response = $this->call( $requestData,"PATCH","update" );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"'.PARAMETERS_ARE_EMPTY.'"}', $response );
+    }
+
+    public function testDelete(): void {
+        $requestData = [ 'id'=>$this->updateId];
+        $response = $this->call( $requestData,"DELETE","delete" );
+        self::assertResponseStatusCodeSame( 200 );
+        self::assertSame( '{"id":'.$requestData[ 'id' ].'}', $response );
+    }
+
+    public function testDeleteError(): void {
+        $requestData = [ 'id'=>$this->invalidId];
+        $response = $this->call( $requestData,"DELETE","delete" );
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"'.POSITION_NOT_FOUND.'"}', $response );
     }
 
 

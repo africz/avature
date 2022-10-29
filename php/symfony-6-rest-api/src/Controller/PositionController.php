@@ -68,6 +68,34 @@ class PositionController extends AbstractController {
         }
     }
 
+    #[ Route( '/delete', name:'app_position_delte', methods:'DELETE' ) ]
+
+    function delete ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
+        $response = null;
+        try {
+            $entityManager = $doctrine->getManager();
+            $parameters = json_decode( $request->get( 'body' ), true );
+            $position = $positionRepository->findOneBy( [ 'id'=>$parameters[ 'id' ] ] );
+            if ( $position ) {
+                $removeId=$position->getId();
+                $positionRepository->remove( $position, true );
+            }else
+            {
+                throw new Exception(POSITION_NOT_FOUND);
+            }
+
+            $retVal = [ 'id'=>$removeId ];
+            $response = new JsonResponse( $retVal, 200 );
+            //created
+            return $response;
+        } catch ( Exception $e ) {
+            //$retVal = $this->exceptionError( $request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace() );
+            $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            return $response;
+        }
+    }//delete
+
+
     function verifyPosition( $parameters ) {
         //var_dump( $parameters );
         if ( empty( $parameters[ 'name' ] ) ) {
@@ -166,9 +194,8 @@ class PositionController extends AbstractController {
                 }
             }
         }
-        if (!$count)
-        {
-            throw new Exception(PARAMETERS_ARE_EMPTY);
+        if ( !$count ) {
+            throw new Exception( PARAMETERS_ARE_EMPTY );
         }
         $entityManager->persist( $position );
         $entityManager->flush();
