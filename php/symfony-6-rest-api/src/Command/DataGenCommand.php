@@ -34,7 +34,7 @@ class DataGenCommand extends Command {
         $this->PositionRepository = $positionRepository;
         $this->entityManager = $this->doctrine->getManager();
         $this->projectRoot = $appKernel->getProjectDir();
-        //unlink($this->projectRoot.DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'data.db');
+        //unlink( $this->projectRoot.DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'data.db' );
         parent::__construct();
     }
 
@@ -65,17 +65,17 @@ class DataGenCommand extends Command {
         $conn = $this->entityManager->getConnection();
         $sql = 'DROP TABLE IF EXISTS doctrine_migration_versions;'.PHP_EOL;
         $sql .= 'DROP TABLE IF EXISTS position;'.PHP_EOL;
-        $sql .= 'DROP TABLE IF EXISTS sqlite_sequence;'.PHP_EOL;
+        $sql .= 'DELETE FROM sqlite_sequence;'.PHP_EOL;
         $sql .= 'DROP TABLE IF EXISTS skills;'.PHP_EOL;
         $sql .= 'CREATE TABLE doctrine_migration_versions (version VARCHAR(191) NOT NULL, executed_at DATETIME DEFAULT NULL, execution_time INTEGER DEFAULT NULL, PRIMARY KEY(version));'.PHP_EOL;
         $sql .= 'CREATE TABLE position (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(40) NOT NULL, salary INTEGER NOT NULL, country VARCHAR(40) NOT NULL);'.PHP_EOL;
-        $sql .= 'CREATE TABLE sqlite_sequence(name,seq);'.PHP_EOL;
         $sql .= 'CREATE TABLE skills (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, position_id INTEGER NOT NULL, name VARCHAR(40) NOT NULL, CONSTRAINT FK_D5311670DD842E46 FOREIGN KEY (position_id) REFERENCES position (id) NOT DEFERRABLE INITIALLY IMMEDIATE);'.PHP_EOL;
         $sql .= 'CREATE INDEX IDX_D5311670DD842E46 ON skills (position_id);'.PHP_EOL;
         $sql .= 'CREATE INDEX skills_name_IDX ON skills (name,position_id);'.PHP_EOL;
         $sql .= 'CREATE INDEX position_country_IDX ON "position" (country);'.PHP_EOL;
         $sql .= 'CREATE INDEX position_salary_IDX ON "position" (salary);'.PHP_EOL;
         $sql .= 'CREATE INDEX position_name_IDX ON "position" (name);'.PHP_EOL;
+        //echo $sql;
 
         $statement = $conn->prepare( $sql );
         $statement->execute();
@@ -86,7 +86,7 @@ class DataGenCommand extends Command {
     }
 
     function genData( $max ) {
-        $nameArray = [ 'PHP', 'C++', 'JavaScript', 'HTML', 'NODE', '.NET', 'C#' ];
+        $nameArray = [ 'Sr PHP Developer', 'Jr C++ developer', 'Senior JavaScript Developer', 'HTML developer', 'Senior NODE developer', '.NET engineer', 'Junior C# developer' ];
         $salaryArray = [ '40000', '50000', '60000', '70000', '80000', '90000', '100000' ];
         $countryArray = [ 'Spain', 'Germany', 'Argentina', 'Chile', 'USA', 'Canada', 'Cyprus' ];
         $skillsArray = [ 'php', 'c++', 'javascript', 'html', 'node', '.net', 'c#', 'docker', 'kubernetes', 'linux', 'mac', 'oracle', 'windows', 'mysql', 'mongodb' ];
@@ -125,8 +125,11 @@ class DataGenCommand extends Command {
                 $io->note( sprintf( 'You passed an argument: %s', $arg1 ) );
             }
 
-            $this->init();
-            $this->genData( $arg1 );
+            if ( $arg1 === 'reset' ) {
+                $this->init();
+            } else {
+                $this->genData( $arg1 );
+            }
 
             if ( $input->getOption( 'option1' ) ) {
                 // ...

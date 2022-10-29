@@ -32,7 +32,6 @@ class PositionController extends AbstractController {
             //created
             return $response;
         } catch ( Exception $e ) {
-            //$retVal = $this->exceptionError( $request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace() );
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
             return $response;
         }
@@ -62,13 +61,12 @@ class PositionController extends AbstractController {
             //created
             return $response;
         } catch ( Exception $e ) {
-            //$retVal = $this->exceptionError( $request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace() );
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
             return $response;
         }
     }
 
-    #[ Route( '/delete', name:'app_position_delte', methods:'DELETE' ) ]
+    #[ Route( '/delete', name:'app_position_delete', methods:'DELETE' ) ]
 
     function delete ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
@@ -89,12 +87,27 @@ class PositionController extends AbstractController {
             //created
             return $response;
         } catch ( Exception $e ) {
-            //$retVal = $this->exceptionError( $request->query, $e->getFile(), $e->getMessage(), $e->getLine(), $e->getTrace() );
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
             return $response;
         }
     }//delete
+    
+    #[ Route( '/search', name:'app_position_search', methods:'POST' ) ]
+    function search ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
+        $response = null;
+        try {
+            $entityManager = $doctrine->getManager();
+            $parameters = json_decode( $request->get( 'body' ), true );
 
+            $retVal = [ 'id'=>$removeId ];
+            $response = new JsonResponse( $retVal, 200 );
+            //created
+            return $response;
+        } catch ( Exception $e ) {
+            $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            return $response;
+        }
+    }//delete
 
     function verifyPosition( $parameters ) {
         //var_dump( $parameters );
