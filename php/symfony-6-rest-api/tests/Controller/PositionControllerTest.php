@@ -11,10 +11,14 @@ class PositionControllerTest extends WebTestCase {
     private KernelBrowser $client;
     private PositionRepository $repository;
     private $path = '/position/';
+    private int $updateId=0;
 
     protected function setUp(): void {
         $this->client = static::createClient();
         $this->repository = static::getContainer()->get( 'doctrine' )->getRepository( Position::class );
+        $position=$this->repository->findWithSmallestId();
+        $this->updateId=$position[0]->getId();
+        $tmp="";
 
         //   foreach ( $this->repository->findAll() as $object ) {
         //       $this->repository->remove( $object, true );
@@ -90,27 +94,27 @@ class PositionControllerTest extends WebTestCase {
     }
 
     public function testPut(): void {
-        $requestData = [ 'id'=>89, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php1', 'javascript', 'node' ] ];
+        $requestData = [ 'id'=>$this->updateId, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php1', 'javascript', 'node' ] ];
         $response = $this->call( $requestData,"PUT","update" );
         self::assertResponseStatusCodeSame( 200 );
         self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
     }
 
     public function testPutNotFound(): void {
-        $requestData = [ 'id'=>7, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
+        $requestData = [ 'id'=>99999999999999, 'name'=>'xyz', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[ 'php', 'c++', 'node' ] ];
         $response = $this->call( $requestData,"PUT","update" );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Id:'.$requestData[ 'id' ].' not found!"}', $response );
     }
 
      public function testPatch(): void {
-         $requestData = [ 'id'=>89, 'name'=>'patchooo'];
+         $requestData = [ 'id'=>$this->updateId, 'name'=>'patchooo'];
          $response = $this->call( $requestData,"PATCH","update" );
          self::assertResponseStatusCodeSame( 200 );
          self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
      }
      public function testPatchNoFields(): void {
-        $requestData = ['id'=>89];
+        $requestData = ['id'=>$this->updateId];
         $response = $this->call( $requestData,"PATCH","update" );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"'.PARAMETERS_ARE_EMPTY.'"}', $response );

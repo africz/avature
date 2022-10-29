@@ -64,5 +64,16 @@ class PositionRepository extends ServiceEntityRepository
 //        ;
 //    }
 
+   public function findWithSmallestId(): array
+   {
+       return $this->createQueryBuilder('p')
+           ->orderBy('p.id', 'DESC')
+           ->setMaxResults(1)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
+
+
 
 }
