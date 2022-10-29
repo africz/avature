@@ -19,6 +19,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class SearchController extends AbstractController {
 
     private $client;
+    private $externalContent=array();
 
     public function __construct( HttpClientInterface $client ) {
         $this->client = $client;
@@ -31,14 +32,13 @@ class SearchController extends AbstractController {
         );
 
         $statusCode = $response->getStatusCode();
-        // $statusCode = 200
+        if ($statusCode!==200)
+        {
+            throw new Exception(EXTERNAL_SOURCE_FAIL);
+        }
         $contentType = $response->getHeaders()[ 'content-type' ][ 0 ];
-        // $contentType = 'application/json'
         $content = $response->getContent();
-        // $content = '{"id":521583, "name":"symfony-docs", ...}'
         $content = $response->toArray();
-        // $content = [ 'id' => 521583, 'name' => 'symfony-docs', ... ]
-
         return $content;
     }
 
@@ -50,12 +50,9 @@ class SearchController extends AbstractController {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
             //http://localhost:8081/jobs?name = Java
-            $externalContent = array();
             for ( $i = 0; $i<count( $parameters[ 'name' ]); $i++ ) {
                 $result=$this->fetchExternalJobSource( $parameters[ 'name' ][$i] );
-                $externalContent=array_merge($result,$externalContent);
-
-
+                $this->externalContent=array_merge($result,$this->externalContent);
             }
 
             $retVal = '';

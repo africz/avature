@@ -40,7 +40,7 @@ class SearchControllerTest extends WebTestCase {
 
 
     public function testSearchByName(): void {
-        $requestData = [ 'name'=>[ 'php', 'node', 'c++' ] ];
+        $requestData = [ 'name'=>[ 'php', 'java', 'c++' ] ];
         $response = $this->call( $requestData, 'POST', 'search' );
         self::assertResponseStatusCodeSame( 200 );
     }
