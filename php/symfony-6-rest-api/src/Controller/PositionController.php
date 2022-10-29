@@ -132,17 +132,18 @@ class PositionController extends AbstractController {
 
     function patch( $parameters, $position, $entityManager ) {
         //var_dump( $parameters );
-        if ( !count( $parameters ) ) {
-            throw new Exception( PARAMETERS_ARE_EMPTY );
-        }
+        $count = 0;
         if ( !empty( $parameters[ 'name' ] ) ) {
             $position->setName( $parameters[ 'name' ] );
+            $count++;
         }
         if ( !empty( $parameters[ 'salary' ] ) ) {
             $position->setName( $parameters[ 'salary' ] );
+            $count++;
         }
         if ( !empty( $parameters[ 'country' ] ) ) {
             $position->setName( $parameters[ 'country' ] );
+            $count++;
         }
         if ( !empty( $parameters[ 'skills' ] )  && count( $parameters[ 'skills' ] ) ) {
             $oldSkills = $position->getSkills();
@@ -156,6 +157,7 @@ class PositionController extends AbstractController {
                     }
                 }
                 if ( !$found ) {
+                    $count++;
                     $skills = new Skills();
                     $skills->setName( $skill_name );
                     $position->addSkill( $skills );
@@ -163,6 +165,10 @@ class PositionController extends AbstractController {
 
                 }
             }
+        }
+        if (!$count)
+        {
+            throw new Exception(PARAMETERS_ARE_EMPTY);
         }
         $entityManager->persist( $position );
         $entityManager->flush();

@@ -109,6 +109,12 @@ class PositionControllerTest extends WebTestCase {
          self::assertResponseStatusCodeSame( 200 );
          self::assertSame( '{"id":'.$requestData[ 'id' ].',"name":"'.$requestData[ 'name' ].'"}', $response );
      }
+     public function testPatchNoFields(): void {
+        $requestData = ['id'=>89];
+        $response = $this->call( $requestData,"PATCH","update" );
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"'.PARAMETERS_ARE_EMPTY.'"}', $response );
+    }
 
 
 }
