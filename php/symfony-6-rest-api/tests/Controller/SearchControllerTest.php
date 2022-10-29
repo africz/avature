@@ -58,8 +58,23 @@ class SearchControllerTest extends WebTestCase {
         //print_r($response);
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"'.NAME_IS_EMPTY.'"}', $response );
-
     }
+
+    public function testSearchByNoName(): void {
+        $requestData = [];
+        $response = $this->call( $requestData, 'POST', 'search' );
+        //print_r($response);
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"Undefined array key \u0022name\u0022"}', $response );
+    }
+    public function testSearchByNameNoParam(): void {
+        $requestData = null;
+        $response = $this->call( $requestData, 'POST', 'search' );
+        //print_r($response);
+        self::assertResponseStatusCodeSame( 400 );
+        self::assertSame( '{"error":"Trying to access array offset on value of type null"}', $response );
+    }
+
 
 
 }
