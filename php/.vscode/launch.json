@@ -21,6 +21,23 @@
             }
         },
         {
+            "name": "cmd",
+            "type": "php",
+            "request": "launch",
+            "program": "/projects/avature/php/symfony-6-rest-api/bin/console",
+            "cwd": "/projects/avature/php/symfony-6-rest-api",
+            "port": 0,
+            "runtimeArgs": [
+                "-dxdebug.start_with_request=yes"
+            ],
+            "args": ["data-gen", "3"],
+            "env": {
+                "XDEBUG_MODE": "debug,develop",
+                "XDEBUG_CONFIG": "client_port=${port}"
+            }
+        },
+
+        {
             "name": "Listen for Xdebug",
             "type": "php",
             "request": "launch",
