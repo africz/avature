@@ -80,8 +80,7 @@ class SearchController extends AbstractController {
 
     public function merge_search() {
         $finalOutput = array();
-        for ( $i = 0; $i<count( $this->internalContent );
-        $i++ ) {
+        for ( $i = 0; $i<count( $this->internalContent );$i++ ) {
             $finalOutput[$i]=[ 'name'=>$this->internalContent[ $i ]->getName(), 
                                    'salary'=>$this->internalContent[ $i ]->getSalary(),
                                    'country'=>$this->internalContent[ $i ]->getCountry(),
@@ -92,11 +91,19 @@ class SearchController extends AbstractController {
                                      for ( $j = 0; $j<count( $skills );$j++ ) {
                                         $finalOutput[$i]['skills'][$j]= $skills[$j]->getName();
                                      }
-
-
         }
-
-         return $finalOutput;
+        
+        $j=$i+1;
+        for ( $i = 0; $i<count( $this->externalContent );$i++ ) {
+            $eName=$this->externalContent[ $i ][0];
+            $eCountry=$this->externalContent[ $i ][1];
+            $eSalary=$this->externalContent[ $i ][2];
+            $eSkills=$this->externalContent[ $i ][3];
+            
+            $finalOutput[$j]=['name'=>$eName,'salary'=>$eSalary,'country'=>$eCountry,'skill'=>$eSkills];
+            $j++;
+        }
+        return $finalOutput;
     }
 
 }

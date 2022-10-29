@@ -38,8 +38,15 @@ class SearchControllerTest extends WebTestCase {
         return $this->client->getResponse()->getContent();
     }
 
+    public function testSearchBySingleName(): void {
+        $requestData = [ 'name'=>[ 'java'] ];
+        $response = $this->call( $requestData, 'POST', 'search' );
+        print_r($response);
+        self::assertResponseStatusCodeSame( 200 );
+    }
 
-    public function testSearchByName(): void {
+
+    public function testSearchByMultiplyName(): void {
         $requestData = [ 'name'=>[ 'php', 'java', 'c++' ] ];
         $response = $this->call( $requestData, 'POST', 'search' );
         self::assertResponseStatusCodeSame( 200 );
