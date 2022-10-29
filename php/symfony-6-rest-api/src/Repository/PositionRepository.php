@@ -74,6 +74,17 @@ class PositionRepository extends ServiceEntityRepository
        ;
    }
 
+   public function findByName($value,$max=999999999): array
+   {
+       return $this->createQueryBuilder('p')
+           ->andWhere('p.name like :val')
+           ->setParameter('val', '%'.$value.'%')
+           ->orderBy('p.name', 'ASC')
+           ->setMaxResults($max)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
 
 
 }
