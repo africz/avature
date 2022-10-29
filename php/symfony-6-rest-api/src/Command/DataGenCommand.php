@@ -15,6 +15,7 @@ use App\Entity\Skills;
 use App\Repository\PositionRepository;
 use Exception;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 #[ AsCommand(
     name: 'data-gen',
@@ -25,11 +26,15 @@ class DataGenCommand extends Command {
     private ManagerRegistry $doctrine;
     private PositionRepository $positionRepository;
     private $entityManager;
+    private int $generatedData = 0;
+    private string $projectRoot;
 
-    public function __construct( PositionRepository $positionRepository, ManagerRegistry $doctrine ) {
+    public function __construct( PositionRepository $positionRepository, ManagerRegistry $doctrine, KernelInterface $appKernel ) {
         $this->doctrine = $doctrine;
         $this->PositionRepository = $positionRepository;
         $this->entityManager = $this->doctrine->getManager();
+        $this->projectRoot = $appKernel->getProjectDir();
+        //unlink($this->projectRoot.DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'data.db');
         parent::__construct();
     }
 
@@ -56,27 +61,21 @@ class DataGenCommand extends Command {
         return $position;
     }
 
-    function truncate( $table ) {
-        $conn = $this->entityManager->getConnection();
-        $sql = 'DELETE FROM '.$table.';'.PHP_EOL;
-        $sql .='UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = '.$table.';'.PHP_EOL;
-        $sql .= 'VACUUM;'.PHP_EOL;
-        $statement = $conn->prepare( $sql );
-        $statement->execute();
-    }
-
     function create() {
         $conn = $this->entityManager->getConnection();
-
-        $sql = 'CREATE TABLE IF NOT EXISTS doctrine_migration_versions (version VARCHAR(191) NOT NULL, executed_at DATETIME DEFAULT NULL, execution_time INTEGER DEFAULT NULL, PRIMARY KEY(version));'.PHP_EOL;
-        $sql .= 'CREATE TABLE IF NOT EXISTS position (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(40) NOT NULL, salary INTEGER NOT NULL, country VARCHAR(40) NOT NULL);'.PHP_EOL;
-        $sql .= 'CREATE TABLE IF NOT EXISTS sqlite_sequence(name,seq);'.PHP_EOL;
-        $sql .= 'CREATE TABLE IF NOT EXISTS skills (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, position_id INTEGER NOT NULL, name VARCHAR(40) NOT NULL, CONSTRAINT FK_D5311670DD842E46 FOREIGN KEY (position_id) REFERENCES position (id) NOT DEFERRABLE INITIALLY IMMEDIATE);'.PHP_EOL;
-        $sql .= 'CREATE INDEX IF NOT EXISTS IDX_D5311670DD842E46 ON skills (position_id);'.PHP_EOL;
-        $sql .= 'CREATE INDEX IF NOT EXISTS skills_name_IDX ON skills (name,position_id);'.PHP_EOL;
-        $sql .= 'CREATE INDEX IF NOT EXISTS position_country_IDX ON "position" (country);'.PHP_EOL;
-        $sql .= 'CREATE INDEX IF NOT EXISTS position_salary_IDX ON "position" (salary);'.PHP_EOL;
-        $sql .= 'CREATE INDEX IF NOT EXISTS position_name_IDX ON "position" (name);'.PHP_EOL;
+        $sql = 'DROP TABLE IF EXISTS doctrine_migration_versions;'.PHP_EOL;
+        $sql .= 'DROP TABLE IF EXISTS position;'.PHP_EOL;
+        $sql .= 'DROP TABLE IF EXISTS sqlite_sequence;'.PHP_EOL;
+        $sql .= 'DROP TABLE IF EXISTS skills;'.PHP_EOL;
+        $sql .= 'CREATE TABLE doctrine_migration_versions (version VARCHAR(191) NOT NULL, executed_at DATETIME DEFAULT NULL, execution_time INTEGER DEFAULT NULL, PRIMARY KEY(version));'.PHP_EOL;
+        $sql .= 'CREATE TABLE position (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(40) NOT NULL, salary INTEGER NOT NULL, country VARCHAR(40) NOT NULL);'.PHP_EOL;
+        $sql .= 'CREATE TABLE sqlite_sequence(name,seq);'.PHP_EOL;
+        $sql .= 'CREATE TABLE skills (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, position_id INTEGER NOT NULL, name VARCHAR(40) NOT NULL, CONSTRAINT FK_D5311670DD842E46 FOREIGN KEY (position_id) REFERENCES position (id) NOT DEFERRABLE INITIALLY IMMEDIATE);'.PHP_EOL;
+        $sql .= 'CREATE INDEX IDX_D5311670DD842E46 ON skills (position_id);'.PHP_EOL;
+        $sql .= 'CREATE INDEX skills_name_IDX ON skills (name,position_id);'.PHP_EOL;
+        $sql .= 'CREATE INDEX position_country_IDX ON "position" (country);'.PHP_EOL;
+        $sql .= 'CREATE INDEX position_salary_IDX ON "position" (salary);'.PHP_EOL;
+        $sql .= 'CREATE INDEX position_name_IDX ON "position" (name);'.PHP_EOL;
 
         $statement = $conn->prepare( $sql );
         $statement->execute();
@@ -84,8 +83,6 @@ class DataGenCommand extends Command {
 
     function init() {
         $this->create();
-        $this->truncate( 'position' );
-        $this->truncate( 'skills' );
     }
 
     function genData( $max ) {
@@ -94,23 +91,24 @@ class DataGenCommand extends Command {
         $countryArray = [ 'Spain', 'Germany', 'Argentina', 'Chile', 'USA', 'Canada', 'Cyprus' ];
         $skillsArray = [ 'php', 'c++', 'javascript', 'html', 'node', '.net', 'c#', 'docker', 'kubernetes', 'linux', 'mac', 'oracle', 'windows', 'mysql', 'mongodb' ];
         for ( $i = 0; $i<$max; $i++ ) {
-            $nameIndex = rand( 0, (count( $nameArray )-1) );
-            $name = $nameArray[ $nameIndex ].'-'.($i+1);
+            $nameIndex = rand( 0, ( count( $nameArray )-1 ) );
+            $name = $nameArray[ $nameIndex ].'-'.( $i+1 );
 
-            $countryIndex = rand( 0, (count( $countryArray )-1) );
+            $countryIndex = rand( 0, ( count( $countryArray )-1 ) );
             $country = $countryArray[ $countryIndex ];
 
-            $salaryIndex = rand( 0, (count( $salaryArray )-1) );
+            $salaryIndex = rand( 0, ( count( $salaryArray )-1 ) );
             $salary = $salaryArray[ $salaryIndex ];
             $skills = array();
-            for ( $j = 0; $j<rand( 0, (count( $skillsArray )-1) );
+            for ( $j = 0; $j<rand( 0, ( count( $skillsArray )-1 ) );
             $j++ ) {
                 $skills[ $j ] = $skillsArray[ rand( 0, ( count( $skillsArray )-1 ) ) ];
             }
             $parameters = [ 'name'=>$name, 'salary'=>$salary, 'country'=>$country, 'skills'=> $skills ];
             $position = new Position();
             $newPosition = $this->insert( $parameters, $position );
-            echo ($i.'/'.$max).PHP_EOL;
+            echo ( $i.'/'.$max ).PHP_EOL;
+            $this->generatedData++;
         }
 
     }
@@ -130,12 +128,11 @@ class DataGenCommand extends Command {
             $this->init();
             $this->genData( $arg1 );
 
-
             if ( $input->getOption( 'option1' ) ) {
                 // ...
             }
 
-            $io->success( $arg1.' records generated successfully.' );
+            $io->success( $this->generatedData.'/'.$arg1.' records generated successfully.' );
 
             return Command::SUCCESS;
         } catch( Exception $e ) {
