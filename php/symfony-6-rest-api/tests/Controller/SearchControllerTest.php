@@ -6,13 +6,13 @@ use App\Entity\Position;
 use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use App\Test\Controller\JobControllerTest;
+use App\Test\Controller\BaseControllerTest;
 use App\ErrorMessages;
 
 /**
  * SearchControllerTest
  */
-class SearchControllerTest extends JobControllerTest {
+class SearchControllerTest extends BaseControllerTest {
 
     public function testSearchBySingleName(): void {
         $requestData = [ 'name'=>[ 'java'] ];

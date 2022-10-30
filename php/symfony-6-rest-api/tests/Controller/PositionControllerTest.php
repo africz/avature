@@ -6,10 +6,10 @@ use App\Entity\Position;
 use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use App\Test\Controller\JobControllerTest;
+use App\Test\Controller\BaseControllerTest;
 use App\ErrorMessages;
 
-class PositionControllerTest extends JobControllerTest {
+class PositionControllerTest extends BaseControllerTest {
 
     public function testNewOK(): void {
         $found = true;

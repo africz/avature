@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Psr\Log\LoggerInterface;
 use App\ErrorMessages;
 
-class JobControllerTest extends WebTestCase {
+class BaseControllerTest extends WebTestCase {
     protected KernelBrowser $client;
     protected PositionRepository $repository;
     protected $path = '/position/';
