@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Position;
 use App\Entity\Skills;
+use App\ErrorMessages;
 use App\Repository\PositionRepository;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -77,13 +78,13 @@ class SearchController extends BaseController {
             $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
             
             if ( !count( $parameters[ 'name' ] ) ) {
-                throw new Exception( NAME_IS_EMPTY );
+                throw new Exception( ErrorMessages::NAME_IS_EMPTY );
             }
 
             for ( $i = 0; $i<count( $parameters[ 'name' ] );
             $i++ ) {
                 if ( trim($parameters[ 'name' ][$i]==="")) {
-                    throw new Exception( NAME_IS_EMPTY );
+                    throw new Exception( ErrorMessages::NAME_IS_EMPTY );
                 }
     
                 $result = $this->fetchExternalJobSource( $parameters[ 'name' ][ $i ] );
@@ -125,7 +126,7 @@ class SearchController extends BaseController {
 
         $statusCode = $response->getStatusCode();
         if ( $statusCode !== 200 ) {
-            throw new Exception( EXTERNAL_SOURCE_FAIL );
+            throw new Exception( ErrorMessages::EXTERNAL_SOURCE_FAIL );
 
         }
         $contentType = $response->getHeaders()[ 'content-type' ][ 0 ];

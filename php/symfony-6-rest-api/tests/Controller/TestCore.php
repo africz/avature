@@ -5,6 +5,7 @@ use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Psr\Log\LoggerInterface;
+use App\ErrorMessages;
 
 class TestCore extends WebTestCase {
     protected KernelBrowser $client;

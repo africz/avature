@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Position;
 use App\Entity\Skills;
+use App\ErrorMessages;
 use App\Repository\PositionRepository;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -188,7 +189,7 @@ class PositionController extends BaseController {
                 $removeId = $position->getId();
                 $positionRepository->remove( $position, true );
             } else {
-                throw new Exception( POSITION_NOT_FOUND );
+                throw new Exception( ErrorMessages::POSITION_NOT_FOUND );
             }
 
             $retVal = [ 'id'=>$removeId ];
@@ -213,16 +214,16 @@ class PositionController extends BaseController {
     function verifyPosition( $parameters ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         if ( empty( $parameters[ 'name' ] ) ) {
-            throw new Exception( NAME_IS_EMPTY );
+            throw new Exception( ErrorMessages::NAME_IS_EMPTY );
         }
         if ( empty( $parameters[ 'salary' ] ) ) {
-            throw new Exception( SALARY_IS_EMPTY );
+            throw new Exception( ErrorMessages::SALARY_IS_EMPTY );
         }
         if ( empty( $parameters[ 'country' ] ) ) {
-            throw new Exception( COUNTRY_IS_EMPTY );
+            throw new Exception( ErrorMessages::COUNTRY_IS_EMPTY );
         }
         if ( !count( $parameters[ 'skills' ] ) ) {
-            throw new Exception( SKILLS_ARE_EMPTY );
+            throw new Exception( ErrorMessages::SKILLS_ARE_EMPTY );
         }
     }
     /*verifyPosition*/
@@ -339,7 +340,7 @@ class PositionController extends BaseController {
             }
         }
         if ( !$count ) {
-            throw new Exception( PARAMETERS_ARE_EMPTY );
+            throw new Exception( ErrorMessages::PARAMETERS_ARE_EMPTY );
         }
         $entityManager->persist( $position );
         $entityManager->flush();

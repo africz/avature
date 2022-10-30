@@ -7,6 +7,7 @@ use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Test\Controller\JobControllerTest;
+use App\ErrorMessages;
 
 /**
  * SearchControllerTest
@@ -29,7 +30,7 @@ class SearchControllerTest extends JobControllerTest {
         $requestData = [ 'name'=>[''] ];
         $response = $this->call( $requestData, 'POST', 'search' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.NAME_IS_EMPTY.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::NAME_IS_EMPTY.'"}', $response );
     }
 
     public function testSearchByNoName(): void {

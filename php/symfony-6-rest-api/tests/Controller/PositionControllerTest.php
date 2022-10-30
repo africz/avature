@@ -7,6 +7,7 @@ use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Test\Controller\JobControllerTest;
+use App\ErrorMessages;
 
 class PositionControllerTest extends JobControllerTest {
 
@@ -34,21 +35,21 @@ class PositionControllerTest extends JobControllerTest {
         $requestData = [ 'name' => '', 'salary' => '5000', 'country' => 'Hungary' ];
         $response = $this->call( $requestData, 'POST', 'new' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.NAME_IS_EMPTY.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::NAME_IS_EMPTY.'"}', $response );
     }
 
     public function testNewSalaryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '', 'country' => 'Hungary' ];
         $response = $this->call( $requestData, 'POST', 'new' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.SALARY_IS_EMPTY.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::SALARY_IS_EMPTY.'"}', $response );
     }
 
     public function testNewCountryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => '' ];
         $response = $this->call( $requestData, 'POST', 'new' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.COUNTRY_IS_EMPTY.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::COUNTRY_IS_EMPTY.'"}', $response );
     }
 
     public function testNewNoSkills(): void {
@@ -62,7 +63,7 @@ class PositionControllerTest extends JobControllerTest {
         $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => 'Hungary', 'skills'=>[] ];
         $response = $this->call( $requestData, 'POST', 'new' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.SKILLS_ARE_EMPTY.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::SKILLS_ARE_EMPTY.'"}', $response );
     }
 
     public function testPut(): void {
@@ -90,7 +91,7 @@ class PositionControllerTest extends JobControllerTest {
         $requestData = [ 'id'=>$this->updateId ];
         $response = $this->call( $requestData, 'PATCH', 'update' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.PARAMETERS_ARE_EMPTY.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::PARAMETERS_ARE_EMPTY.'"}', $response );
     }
 
     public function testDelete(): void {
@@ -104,7 +105,7 @@ class PositionControllerTest extends JobControllerTest {
         $requestData = [ 'id'=>$this->invalidId ];
         $response = $this->call( $requestData, 'DELETE', 'delete' );
         self::assertResponseStatusCodeSame( 400 );
-        self::assertSame( '{"error":"'.POSITION_NOT_FOUND.'"}', $response );
+        self::assertSame( '{"error":"'.ErrorMessages::POSITION_NOT_FOUND.'"}', $response );
     }
 
 
