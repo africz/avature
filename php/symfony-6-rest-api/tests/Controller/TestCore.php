@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Test\Controller;
-
 use App\Entity\Position;
 use App\Repository\PositionRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Psr\Log\LoggerInterface;
 
-class JobControllerTest extends WebTestCase {
+class TestCore extends WebTestCase {
     protected KernelBrowser $client;
     protected PositionRepository $repository;
     protected $path = '/position/';
@@ -24,14 +22,9 @@ class JobControllerTest extends WebTestCase {
         $this->updateId = $position[ 0 ]->getId();
     }
 
-    function getFunc($function,$line)
-    {
-        $path_parts = pathinfo(__FILE__);
-        return $function."(),".$path_parts['filename'].':'.$line;
-    }
-
     function call ( $requestData, $method, $path ): string {
-        $this->log->debug($this->getFunc(__FUNCTION__,__LINE__),['request data'=>$requestData,'method'=>$method,'path'=>$path]);
+        $func="call()";
+        $this->log->error($func,['request data'=>$requestData,'method'=>$method,'path'=>$path]);
         $requestJson = json_encode( $requestData, JSON_THROW_ON_ERROR );
         $this->client->request( $method, sprintf( '%s'.$path, $this->path ), [
             'headers' => [
