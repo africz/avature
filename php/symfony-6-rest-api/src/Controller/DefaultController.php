@@ -15,7 +15,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[ Route( '/' ) ]
 
-class DefaultController extends JobController {
+class DefaultController extends BaseController {
 
     #[ Route( '/', name:'app_index', methods:['POST','GET','PUT','PATCH','DELETE'] ) ]
 

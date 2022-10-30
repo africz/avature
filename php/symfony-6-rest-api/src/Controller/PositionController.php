@@ -18,7 +18,8 @@ use Psr\Log\LoggerInterface;
 */
 #[ Route( '/position' ) ]
 
-class PositionController extends JobController {
+class PositionController extends BaseController {
+
 
    /**
     * new

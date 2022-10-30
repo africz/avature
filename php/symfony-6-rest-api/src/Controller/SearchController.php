@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * SearchController
  */
-class SearchController extends JobController {
+class SearchController extends BaseController {
 
     private $client;
 

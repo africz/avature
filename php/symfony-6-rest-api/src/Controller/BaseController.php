@@ -8,7 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 
 
-class JobController extends AbstractController {
+class BaseController extends AbstractController {
     protected LoggerInterface $log;
 
     function __construct(LoggerInterface $logger)
