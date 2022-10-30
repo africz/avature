@@ -6,16 +6,16 @@ use App\Entity\Position;
 use App\Entity\Skills;
 use App\Repository\PositionRepository;
 use Exception;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 
 #[ Route( '/position' ) ]
 
-class PositionController extends AbstractController {
+class PositionController extends JobController {
 
     #[ Route( '/new', name:'app_position_new', methods:'POST' ) ]
 
@@ -24,19 +24,21 @@ class PositionController extends AbstractController {
         try {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
 
             $position = new Position();
             $newPosition = $this->insert( $parameters, $position, $entityManager );
             $retVal = [ 'id'=>$newPosition->getId(), 'name'=>$newPosition->getName() ];
             $response = new JsonResponse( $retVal, 201 );
-            //created
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
             return $response;
         } catch ( Exception $e ) {
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
             return $response;
         }
     }
-    //new
+    /*new*/
 
     #[ Route( '/update', name:'app_position_update', methods:[ 'PUT', 'PATCH' ] ) ]
 
@@ -45,6 +47,7 @@ class PositionController extends AbstractController {
         try {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
             $position = $positionRepository->findOneBy( [ 'id'=>$parameters[ 'id' ] ] );
             if ( empty( $position ) ) {
                 throw new Exception( 'Id:'.$parameters[ 'id' ].' not found!' );
@@ -55,16 +58,16 @@ class PositionController extends AbstractController {
             if ( $request->isMethod( 'PATCH' ) ) {
                 $newPosition = $this->patch( $parameters, $position, $entityManager );
             }
-            //var_dump( $position );
             $retVal = [ 'id'=>$newPosition->getId(), 'name'=>$newPosition->getName() ];
             $response = new JsonResponse( $retVal, 200 );
-            //created
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
             return $response;
         } catch ( Exception $e ) {
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
             return $response;
         }
-    }
+    }/*update*/
 
     #[ Route( '/delete', name:'app_position_delete', methods:'DELETE' ) ]
 
@@ -73,44 +76,50 @@ class PositionController extends AbstractController {
         try {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
             $position = $positionRepository->findOneBy( [ 'id'=>$parameters[ 'id' ] ] );
             if ( $position ) {
-                $removeId=$position->getId();
+                $removeId = $position->getId();
                 $positionRepository->remove( $position, true );
-            }else
-            {
-                throw new Exception(POSITION_NOT_FOUND);
+            } else {
+                throw new Exception( POSITION_NOT_FOUND );
             }
 
             $retVal = [ 'id'=>$removeId ];
             $response = new JsonResponse( $retVal, 200 );
-            //created
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
             return $response;
         } catch ( Exception $e ) {
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
             return $response;
         }
-    }//delete
-    
+    }
+    /*delete*/
+
     #[ Route( '/search', name:'app_position_search', methods:'POST' ) ]
+
     function search ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
         try {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
 
             $retVal = [ 'id'=>$removeId ];
             $response = new JsonResponse( $retVal, 200 );
-            //created
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
             return $response;
         } catch ( Exception $e ) {
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
             return $response;
         }
-    }//delete
+    }
+    /*search*/
 
     function verifyPosition( $parameters ) {
-        //var_dump( $parameters );
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         if ( empty( $parameters[ 'name' ] ) ) {
             throw new Exception( NAME_IS_EMPTY );
         }
@@ -123,10 +132,11 @@ class PositionController extends AbstractController {
         if ( !count( $parameters[ 'skills' ] ) ) {
             throw new Exception( SKILLS_ARE_EMPTY );
         }
-
     }
+    /*verifyPosition*/
 
     function insert( $parameters, $position, $entityManager ) {
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $this->verifyPosition( $parameters );
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
@@ -140,10 +150,13 @@ class PositionController extends AbstractController {
         }
         $entityManager->persist( $position );
         $entityManager->flush();
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'position'=>$position ] );
         return $position;
     }
+    /*insert*/
 
     function put( $parameters, $position, $entityManager ) {
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $this->verifyPosition( $parameters );
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
@@ -168,11 +181,13 @@ class PositionController extends AbstractController {
         }
         $entityManager->persist( $position );
         $entityManager->flush();
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'position'=>$position ] );
         return $position;
     }
+    /*put*/
 
     function patch( $parameters, $position, $entityManager ) {
-        //var_dump( $parameters );
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $count = 0;
         if ( !empty( $parameters[ 'name' ] ) ) {
             $position->setName( $parameters[ 'name' ] );
@@ -212,6 +227,8 @@ class PositionController extends AbstractController {
         }
         $entityManager->persist( $position );
         $entityManager->flush();
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'position'=>$position ] );
         return $position;
     }
 }
+/*patch*/

@@ -6,7 +6,6 @@ use App\Entity\Position;
 use App\Entity\Skills;
 use App\Repository\PositionRepository;
 use Exception;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +15,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[ Route( '/position' ) ]
 
-class SearchController extends AbstractController {
+class SearchController extends JobController {
 
     private $client;
 
