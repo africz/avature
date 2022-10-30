@@ -22,17 +22,16 @@ class SearchController extends JobController {
     private $externalContent = array();
     private $internalContent = array();
 
-    public function __construct( HttpClientInterface $client ) {
-        $this->client = $client;
-    }
 
     #[ Route( '/search', name:'app_position_search', methods:'POST' ) ]
 
-    function search ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
+    function search ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ,HttpClientInterface $client ): JsonResponse {
         $response = null;
         try {
             $entityManager = $doctrine->getManager();
             $parameters = json_decode( $request->get( 'body' ), true );
+            $this->client=$client;
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
             
             if ( !count( $parameters[ 'name' ] ) ) {
                 throw new Exception( NAME_IS_EMPTY );
@@ -45,26 +44,30 @@ class SearchController extends JobController {
                 }
     
                 $result = $this->fetchExternalJobSource( $parameters[ 'name' ][ $i ] );
+                $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'external'=>$result ] );
                 $this->externalContent = array_merge( $result, $this->externalContent );
             }
 
             for ( $i = 0; $i<count( $parameters[ 'name' ] );
             $i++ ) {
                 $result = $this->fetchPositions( $parameters[ 'name' ][ $i ], $positionRepository );
+                $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'internal'=>$result ] );
                 $this->internalContent = array_merge( $result, $this->internalContent );
             }
 
             $retVal = $this->merge_search();
             $response = new JsonResponse( $retVal, 200 );
-            //created
+            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
             return $response;
         } catch ( Exception $e ) {
             $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
+            $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
             return $response;
         }
     }
 
     public function fetchExternalJobSource( $name ): array {
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
         $response = $this->client->request(
             'GET',
             'http://localhost:8081/jobs?name='.$name
@@ -73,6 +76,7 @@ class SearchController extends JobController {
         $statusCode = $response->getStatusCode();
         if ( $statusCode !== 200 ) {
             throw new Exception( EXTERNAL_SOURCE_FAIL );
+
         }
         $contentType = $response->getHeaders()[ 'content-type' ][ 0 ];
         $content = $response->getContent();
@@ -81,6 +85,7 @@ class SearchController extends JobController {
     }
 
     public function fetchPositions( $name, $positionRepository ) {
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
         $result = $positionRepository->findByName( " ".$name." " );
         return $result;
     }
@@ -110,6 +115,7 @@ class SearchController extends JobController {
             $finalOutput[$j]=['name'=>$eName,'salary'=>$eSalary,'country'=>$eCountry,'skill'=>$eSkills];
             $j++;
         }
+        $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'finalOutput'=>$finalOutput ] );
         return $finalOutput;
     }
 
