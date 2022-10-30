@@ -15,16 +15,59 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[ Route( '/position' ) ]
 
+/**
+ * SearchController
+ */
 class SearchController extends JobController {
 
     private $client;
 
     private $externalContent = array();
     private $internalContent = array();
-
-
+    
+    /**
+    * search
+    *
+    * Request Data
+    * ------------
+    *  {
+    *    "name":
+    *    [
+    *        "php",
+    *        "java",
+    *        "c++"
+    *     ]
+    *  } 
+    *
+    * Response Success
+    * ----------------
+    * {
+    *    "0":{
+    *        "name":"Jr C++ developer-10",
+    *        "salary":90000,
+    *        "country":"Cyprus",
+    *        "skills":["php","linux"]
+    *        },
+    *    "1":{
+    *       "name":"Jr C++ developer-17",
+    *       "salary":40000,
+    *       "country":"Chile",
+    *       "skills":["mac","javascript","oracle","mac","node","php"]},
+    *       ....
+    *
+    * Response Error
+    * --------------
+    * {
+    *    "error":"Name is empty!"
+    * }
+    * 
+    * @param  mixed $request
+    * @param  mixed $positionRepository
+    * @param  mixed $doctrine
+    * @param  mixed $client
+    * @return JsonResponse
+    */
     #[ Route( '/search', name:'app_position_search', methods:'POST' ) ]
-
     function search ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ,HttpClientInterface $client ): JsonResponse {
         $response = null;
         try {
@@ -65,7 +108,14 @@ class SearchController extends JobController {
             return $response;
         }
     }
-
+    
+    /**
+     * fetchExternalJobSource
+     * Retrive jobs from external resource
+     *
+     * @param  mixed $name
+     * @return array
+     */
     public function fetchExternalJobSource( $name ): array {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
         $response = $this->client->request(
@@ -83,13 +133,27 @@ class SearchController extends JobController {
         $content = $response->toArray();
         return $content;
     }
-
+    
+    /**
+     * fetchPositions
+     * Retrive positions from db 
+     *
+     * @param  mixed $name
+     * @param  mixed $positionRepository
+     * @return void
+     */
     public function fetchPositions( $name, $positionRepository ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
         $result = $positionRepository->findByName( " ".$name." " );
         return $result;
     }
-
+    
+    /**
+     * merge_search
+     * Merge and transform external and internal source to one response
+     *
+     * @return void
+     */
     public function merge_search() {
         $finalOutput = array();
         for ( $i = 0; $i<count( $this->internalContent );$i++ ) {

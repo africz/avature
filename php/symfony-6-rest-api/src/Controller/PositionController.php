@@ -13,10 +13,49 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 
+/**
+* PositionController handle new, update, delete requests
+*/
 #[ Route( '/position' ) ]
 
 class PositionController extends JobController {
 
+   /**
+    * new
+    *
+    * Request Data
+    * ------------
+    * {
+    *   "name":"PHP",
+    *   "salary":"5000",
+    *   "country":"Hungary",
+    *       "skills":
+    *         [
+    *          "php",
+    *          "c++",
+    *          "node"
+    *         ]
+    * }
+    *
+    * Response Success
+    * ----------------
+    * {
+    *   "id":142,
+    *   "name":"PHP"
+    * }
+    *
+    * Response Error
+    * --------------
+    * {
+    *    "error":"Country is empty!"
+    * }
+    * 
+    *
+    * @param  mixed $request
+    * @param  mixed $positionRepository
+    * @param  mixed $doctrine
+    * @return JsonResponse
+    */
     #[ Route( '/new', name:'app_position_new', methods:'POST' ) ]
 
     function new ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
@@ -40,6 +79,44 @@ class PositionController extends JobController {
     }
     /*new*/
 
+    /**
+    * update 
+    *
+    * Handle full update (PUT) and partial update requests (PATCH)
+    *
+    * Request Data
+    * ------------
+    * {
+    *   "name":"PHP",
+    *   "salary":"5000",
+    *   "country":"Hungary",
+    *       "skills":
+    *         [
+    *          "php",
+    *          "c++",
+    *          "node"
+    *         ]
+    * }
+    *
+    * Response Success
+    * ----------------
+    * {
+    *   "id":142,
+    *   "name":"PHP"
+    * }
+    *
+    * Response Error
+    * --------------
+    * {
+    *    "error":"Country is empty!"
+    * }
+    * 
+    *
+    * @param  mixed $request
+    * @param  mixed $positionRepository
+    * @param  mixed $doctrine
+    * @return JsonResponse
+    */
     #[ Route( '/update', name:'app_position_update', methods:[ 'PUT', 'PATCH' ] ) ]
 
     function update ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
@@ -67,8 +144,36 @@ class PositionController extends JobController {
             $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
             return $response;
         }
-    }/*update*/
+    }
+    /*update*/
 
+    /**
+    * delete
+    *
+    * Request Data
+    * ------------
+    * {
+    *    "id":141
+    * }
+    *
+    * Response Success
+    * ----------------
+    * {
+    *   "id":141,
+    * }
+    *
+    * Response Error
+    * --------------
+    * {
+    *    "error":"Position not found!"
+    * }
+    * 
+    *
+    * @param  mixed $request
+    * @param  mixed $positionRepository
+    * @param  mixed $doctrine
+    * @return JsonResponse
+    */
     #[ Route( '/delete', name:'app_position_delete', methods:'DELETE' ) ]
 
     function delete ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
@@ -97,27 +202,13 @@ class PositionController extends JobController {
     }
     /*delete*/
 
-    #[ Route( '/search', name:'app_position_search', methods:'POST' ) ]
-
-    function search ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
-        $response = null;
-        try {
-            $entityManager = $doctrine->getManager();
-            $parameters = json_decode( $request->get( 'body' ), true );
-            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
-
-            $retVal = [ 'id'=>$removeId ];
-            $response = new JsonResponse( $retVal, 200 );
-            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
-            return $response;
-        } catch ( Exception $e ) {
-            $response = new JsonResponse( [ 'error' => $e->getMessage() ], 400 );
-            $this->log->error( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'message'=>$e->getMessage() ] );
-            return $response;
-        }
-    }
-    /*search*/
-
+    
+    /**
+    * verify position members
+    * 
+    * @param  mixed $parameters
+    * @return void
+    */
     function verifyPosition( $parameters ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         if ( empty( $parameters[ 'name' ] ) ) {
@@ -134,7 +225,15 @@ class PositionController extends JobController {
         }
     }
     /*verifyPosition*/
-
+    
+    /**
+     * insert
+     *
+     * @param  mixed $parameters
+     * @param  mixed $position
+     * @param  mixed $entityManager
+     * @return void
+     */
     function insert( $parameters, $position, $entityManager ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $this->verifyPosition( $parameters );
@@ -154,7 +253,15 @@ class PositionController extends JobController {
         return $position;
     }
     /*insert*/
-
+    
+    /**
+     * put
+     *
+     * @param  mixed $parameters
+     * @param  mixed $position
+     * @param  mixed $entityManager
+     * @return void
+     */
     function put( $parameters, $position, $entityManager ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $this->verifyPosition( $parameters );
@@ -185,7 +292,15 @@ class PositionController extends JobController {
         return $position;
     }
     /*put*/
-
+    
+    /**
+     * patch
+     *
+     * @param  mixed $parameters
+     * @param  mixed $position
+     * @param  mixed $entityManager
+     * @return void
+     */
     function patch( $parameters, $position, $entityManager ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $count = 0;

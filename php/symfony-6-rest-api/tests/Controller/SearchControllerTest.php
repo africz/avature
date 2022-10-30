@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Test\Controller\JobControllerTest;
 
+/**
+ * SearchControllerTest
+ */
 class SearchControllerTest extends JobControllerTest {
 
     public function testSearchBySingleName(): void {
