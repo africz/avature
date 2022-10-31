@@ -60,7 +60,7 @@ class DataGenCommand extends Command {
      * @param  mixed $position
      * @return void
      */
-    function insert( $parameters, $position ) {
+    private function insert( $parameters, $position ) {
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
         $position->setCountry( $parameters[ 'country' ] );
@@ -81,7 +81,7 @@ class DataGenCommand extends Command {
      *
      * @return void
      */
-    function create() {
+    private function create() {
         $conn = $this->entityManager->getConnection();
         $sql = 'DROP TABLE IF EXISTS doctrine_migration_versions;'.PHP_EOL;
         $sql .= 'DROP TABLE IF EXISTS position;'.PHP_EOL;
@@ -106,7 +106,7 @@ class DataGenCommand extends Command {
      *
      * @return void
      */
-    function init() {
+    private function init() {
         $this->create();
     }
     
@@ -116,7 +116,7 @@ class DataGenCommand extends Command {
      * @param  mixed $max
      * @return void
      */
-    function genData( $max ) {
+    private function genData( $max ) {
         $nameArray = [ 'Sr PHP Developer', 'Jr C++ developer', 'Senior JavaScript Developer', 'HTML developer', 'Senior NODE developer', '.NET engineer', 'Junior C# developer' ];
         $salaryArray = [ '40000', '50000', '60000', '70000', '80000', '90000', '100000' ];
         $countryArray = [ 'Spain', 'Germany', 'Argentina', 'Chile', 'USA', 'Canada', 'Cyprus' ];

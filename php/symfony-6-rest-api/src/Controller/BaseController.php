@@ -32,7 +32,7 @@ class BaseController extends AbstractController {
      * @param  mixed $line
      * @return void
      */
-    function getFunc($function,$line)
+    protected function getFunc($function,$line)
     {
         $path_parts = pathinfo(__FILE__);
         return $function."(),".$path_parts['filename'].':'.$line;
