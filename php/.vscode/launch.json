@@ -14,7 +14,7 @@
             "runtimeArgs": [
                 "-dxdebug.start_with_request=yes"
             ],
-            "args": ["--filter", "testSearchByName"],
+            "args": ["--filter", "testSearchByMultiplyNameAndSalaryAndCountry"],
             "env": {
                 "XDEBUG_MODE": "debug,develop",
                 "XDEBUG_CONFIG": "client_port=${port}"

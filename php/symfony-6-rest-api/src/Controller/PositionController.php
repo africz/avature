@@ -60,7 +60,7 @@ class PositionController extends BaseController {
     */
     #[ Route( '/new', name:'app_position_new', methods:'POST' ) ]
 
-    function new ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
+    public function new ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
         try {
             $entityManager = $doctrine->getManager();
@@ -121,7 +121,7 @@ class PositionController extends BaseController {
     */
     #[ Route( '/update', name:'app_position_update', methods:[ 'PUT', 'PATCH' ] ) ]
 
-    function update ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
+    public function update ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
         try {
             $entityManager = $doctrine->getManager();
@@ -178,7 +178,7 @@ class PositionController extends BaseController {
     */
     #[ Route( '/delete', name:'app_position_delete', methods:'DELETE' ) ]
 
-    function delete ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
+    public function delete ( Request $request, PositionRepository $positionRepository, ManagerRegistry $doctrine ): JsonResponse {
         $response = null;
         try {
             $entityManager = $doctrine->getManager();
@@ -211,7 +211,7 @@ class PositionController extends BaseController {
     * @param  mixed $parameters
     * @return void
     */
-    function verifyPosition( $parameters ) {
+    private function verifyPosition( $parameters ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         if ( empty( $parameters[ 'name' ] ) ) {
             throw new Exception( ErrorMessages::NAME_IS_EMPTY );
@@ -236,7 +236,7 @@ class PositionController extends BaseController {
      * @param  mixed $entityManager
      * @return void
      */
-    function insert( $parameters, $position, $entityManager ) {
+    private function insert( $parameters, $position, $entityManager ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $this->verifyPosition( $parameters );
         $position->setName( $parameters[ 'name' ] );
@@ -264,7 +264,7 @@ class PositionController extends BaseController {
      * @param  mixed $entityManager
      * @return void
      */
-    function put( $parameters, $position, $entityManager ) {
+    private function put( $parameters, $position, $entityManager ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $this->verifyPosition( $parameters );
         $position->setName( $parameters[ 'name' ] );
@@ -303,7 +303,7 @@ class PositionController extends BaseController {
      * @param  mixed $entityManager
      * @return void
      */
-    function patch( $parameters, $position, $entityManager ) {
+    private function patch( $parameters, $position, $entityManager ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'parameters'=>$parameters ] );
         $count = 0;
         if ( !empty( $parameters[ 'name' ] ) ) {

@@ -10,12 +10,13 @@ use App\Test\Controller\BaseControllerTest;
 use App\ErrorMessages;
 
 /**
- * SearchControllerTest
- */
+* SearchControllerTest
+*/
+
 class SearchControllerTest extends BaseControllerTest {
 
     public function testSearchBySingleName(): void {
-        $requestData = [ 'name'=>[ 'java'] ];
+        $requestData = [ 'name'=>[ 'java' ] ];
         $response = $this->call( $requestData, 'POST', 'search' );
         self::assertResponseStatusCodeSame( 200 );
     }
@@ -26,8 +27,14 @@ class SearchControllerTest extends BaseControllerTest {
         self::assertResponseStatusCodeSame( 200 );
     }
 
+    public function testSearchByMultiplyNameAndSalaryAndCountry(): void {
+        $requestData = [ 'name'=>[ 'php', 'java', 'c++' ], 'salary'=>40000, 'country'=>[ 'Spain', 'Argentina' ] ];
+        $response = $this->call( $requestData, 'POST', 'search' );
+        self::assertResponseStatusCodeSame( 200 );
+    }
+
     public function testSearchByEmptyNameError(): void {
-        $requestData = [ 'name'=>[''] ];
+        $requestData = [ 'name'=>[ '' ] ];
         $response = $this->call( $requestData, 'POST', 'search' );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"'.ErrorMessages::NAME_IS_EMPTY.'"}', $response );
@@ -39,6 +46,7 @@ class SearchControllerTest extends BaseControllerTest {
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"Undefined array key \u0022name\u0022"}', $response );
     }
+
     public function testSearchByNameNoParam(): void {
         $requestData = null;
         $response = $this->call( $requestData, 'POST', 'search' );

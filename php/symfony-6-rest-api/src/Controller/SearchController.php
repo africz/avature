@@ -28,6 +28,7 @@ class SearchController extends BaseController {
     
     /**
     * search
+    * Search by name multiply name allowed in an array
     *
     * Request Data
     * ------------
@@ -99,7 +100,7 @@ class SearchController extends BaseController {
                 $this->internalContent = array_merge( $result, $this->internalContent );
             }
 
-            $retVal = $this->merge_search();
+            $retVal = $this->merge_search($parameters);
             $response = new JsonResponse( $retVal, 200 );
             $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'response'=>$response ] );
             return $response;
@@ -117,7 +118,7 @@ class SearchController extends BaseController {
      * @param  mixed $name
      * @return array
      */
-    public function fetchExternalJobSource( $name ): array {
+    private function fetchExternalJobSource( $name ): array {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
         $response = $this->client->request(
             'GET',
@@ -143,19 +144,24 @@ class SearchController extends BaseController {
      * @param  mixed $positionRepository
      * @return void
      */
-    public function fetchPositions( $name, $positionRepository ) {
+    private function fetchPositions( $name, $positionRepository ) {
         $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
         $result = $positionRepository->findByName( " ".$name." " );
         return $result;
     }
-    
+
+    private function filter_search()
+    {
+
+    }
+
     /**
      * merge_search
      * Merge and transform external and internal source to one response
      *
      * @return void
      */
-    public function merge_search() {
+    private function merge_search() {
         $finalOutput = array();
         for ( $i = 0; $i<count( $this->internalContent );$i++ ) {
             $finalOutput[$i]=[ 'name'=>$this->internalContent[ $i ]->getName(), 
