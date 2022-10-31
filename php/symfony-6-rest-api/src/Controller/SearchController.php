@@ -160,6 +160,7 @@ class SearchController extends BaseController {
 
                             /**
                             * filter_search
+                            * remove those records that not match with given country or salary records 
                             *
                             * @param  mixed $parameters
                             * @param  mixed $finalOutput
@@ -183,19 +184,30 @@ class SearchController extends BaseController {
                                             $j++;
                                         }
                                         if ( !$found ) {
-                                            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'toRemove:finalOutput[i]'=>$finalOutput[ $i ] ] );
+                                            $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'toRemove(country):finalOutput[i]'=>$finalOutput[ $i ] ] );
                                             array_push( $toRemove, $i );
                                         }
 
+                                    }
+                                    if ( !empty( $parameters[ 'salary' ] ) ) {
+                                        if ( $finalOutput[ $i ][ 'salary' ]  <= $parameters[ 'salary' ] ) {
+                                            if ( !in_array( $i, $toRemove ) ) {
+                                                $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'toRemove(salary):finalOutput[i]'=>$finalOutput[ $i ] ] );
+                                                array_push( $toRemove, $i );
+                                            }
+                                        }
                                     }
 
                                     $i++;
                                 }
                                 $i = 0;
+                                $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'toRemove(all)'=>$toRemove ] );
                                 while( $i<count( $toRemove ) ) {
-                                    unset( $finalOutput[ $toRemove[$i] ] );
+                                    unset( $finalOutput[ $toRemove[ $i ] ] );
                                     $i++;
                                 }
+                                //print_r( $toRemove );
+                                //print_r( $finalOutput );
                                 $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'return:finalOutput'=>$finalOutput ] );
                                 return $finalOutput;
 
