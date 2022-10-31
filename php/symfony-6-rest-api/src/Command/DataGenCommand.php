@@ -22,6 +22,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
     description: 'Generate init data',
 ) ]
 
+/**
+ * DataGenCommand
+ */
 class DataGenCommand extends Command {
     private ManagerRegistry $doctrine;
     private PositionRepository $positionRepository;
@@ -37,14 +40,26 @@ class DataGenCommand extends Command {
         //unlink( $this->projectRoot.DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'data.db' );
         parent::__construct();
     }
-
+    
+    /**
+     * configure
+     *
+     * @return void
+     */
     protected function configure(): void {
         $this
         ->addArgument( 'arg1', InputArgument::OPTIONAL, 'Argument description' )
         ->addOption( 'option1', null, InputOption::VALUE_NONE, 'Option description' )
         ;
     }
-
+    
+    /**
+     * insert
+     *
+     * @param  mixed $parameters
+     * @param  mixed $position
+     * @return void
+     */
     function insert( $parameters, $position ) {
         $position->setName( $parameters[ 'name' ] );
         $position->setSalary( $parameters[ 'salary' ] );
@@ -60,7 +75,12 @@ class DataGenCommand extends Command {
         $this->entityManager->flush();
         return $position;
     }
-
+    
+    /**
+     * create
+     *
+     * @return void
+     */
     function create() {
         $conn = $this->entityManager->getConnection();
         $sql = 'DROP TABLE IF EXISTS doctrine_migration_versions;'.PHP_EOL;
@@ -80,11 +100,22 @@ class DataGenCommand extends Command {
         $statement = $conn->prepare( $sql );
         $statement->execute();
     }
-
+    
+    /**
+     * init
+     *
+     * @return void
+     */
     function init() {
         $this->create();
     }
-
+    
+    /**
+     * genData
+     *
+     * @param  mixed $max
+     * @return void
+     */
     function genData( $max ) {
         $nameArray = [ 'Sr PHP Developer', 'Jr C++ developer', 'Senior JavaScript Developer', 'HTML developer', 'Senior NODE developer', '.NET engineer', 'Junior C# developer' ];
         $salaryArray = [ '40000', '50000', '60000', '70000', '80000', '90000', '100000' ];
@@ -112,7 +143,14 @@ class DataGenCommand extends Command {
         }
 
     }
-
+    
+    /**
+     * execute
+     *
+     * @param  mixed $input
+     * @param  mixed $output
+     * @return int
+     */
     protected function execute( InputInterface $input, OutputInterface $output ): int {
 
         try {

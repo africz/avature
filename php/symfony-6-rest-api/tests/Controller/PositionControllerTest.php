@@ -9,8 +9,17 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Test\Controller\BaseControllerTest;
 use App\ErrorMessages;
 
+/**
+ * PositionControllerTest
+ */
 class PositionControllerTest extends BaseControllerTest {
-
+    
+    /**
+     * testNewOK
+     * Test how to create a new record successfully without any errors.
+     *
+     * @return void
+     */
     public function testNewOK(): void {
         $found = true;
         $baseName = 'PHP';
@@ -30,21 +39,39 @@ class PositionControllerTest extends BaseControllerTest {
         self::assertResponseStatusCodeSame( 201 );
         self::assertSame( $requestData[ 'name' ], $response[ 'name' ] );
     }
-
+    
+    /**
+     * testNewNameEmpty
+     * Test how to handle error if name parameter is empty.
+     * 
+     * @return void
+     */
     public function testNewNameEmpty(): void {
         $requestData = [ 'name' => '', 'salary' => '5000', 'country' => 'Hungary' ];
         $response = $this->call( $requestData, 'POST', 'new' );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"'.ErrorMessages::NAME_IS_EMPTY.'"}', $response );
     }
-
+    
+    /**
+     * testNewSalaryEmpty
+     * Test new record creation with empty salary parameter.
+     *
+     * @return void
+     */
     public function testNewSalaryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '', 'country' => 'Hungary' ];
         $response = $this->call( $requestData, 'POST', 'new' );
         self::assertResponseStatusCodeSame( 400 );
         self::assertSame( '{"error":"'.ErrorMessages::SALARY_IS_EMPTY.'"}', $response );
     }
-
+    
+    /**
+     * testNewCountryEmpty
+     * Test new record creation with empty country parameter.
+     *
+     * @return void
+     */
     public function testNewCountryEmpty(): void {
         $requestData = [ 'name' => 'PHP', 'salary' => '5000', 'country' => '' ];
         $response = $this->call( $requestData, 'POST', 'new' );

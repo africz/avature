@@ -13,12 +13,21 @@ use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-#[ Route( '/' ) ]
 
+/**
+ * DefaultController
+ */
+#[ Route( '/' ) ]
 class DefaultController extends BaseController {
 
     #[ Route( '/', name:'app_index', methods:['POST','GET','PUT','PATCH','DELETE'] ) ]
-
+    
+    /**
+     * index
+     *
+     * @param  mixed $request
+     * @return JsonResponse
+     */
     function index ( Request $request ): JsonResponse {
         $response = null;
         try {

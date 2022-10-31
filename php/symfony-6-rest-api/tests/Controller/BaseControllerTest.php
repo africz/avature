@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Psr\Log\LoggerInterface;
 use App\ErrorMessages;
 
+/**
+ * BaseControllerTest
+ */
 class BaseControllerTest extends WebTestCase {
     protected KernelBrowser $client;
     protected PositionRepository $repository;
@@ -24,13 +27,29 @@ class BaseControllerTest extends WebTestCase {
         $position = $this->repository->findWithSmallestId();
         $this->updateId = $position[ 0 ]->getId();
     }
-
+    
+    /**
+     * getFunc
+     * Create debug info for log entries
+     *
+     * @param  mixed $function
+     * @param  mixed $line
+     * @return void
+     */
     function getFunc($function,$line)
     {
         $path_parts = pathinfo(__FILE__);
         return $function."(),".$path_parts['filename'].':'.$line;
     }
-
+    
+    /**
+     * call
+     *
+     * @param  mixed $requestData
+     * @param  mixed $method
+     * @param  mixed $path
+     * @return string
+     */
     function call ( $requestData, $method, $path ): string {
         $this->log->debug($this->getFunc(__FUNCTION__,__LINE__),['request data'=>$requestData,'method'=>$method,'path'=>$path]);
         $requestJson = json_encode( $requestData, JSON_THROW_ON_ERROR );

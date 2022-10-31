@@ -63,7 +63,13 @@ class PositionRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-
+   
+   /**
+    * findWithSmallestId
+    * Find the smallest id for update tests
+    *
+    * @return array
+    */
    public function findWithSmallestId(): array
    {
        return $this->createQueryBuilder('p')
@@ -73,7 +79,16 @@ class PositionRepository extends ServiceEntityRepository
            ->getResult()
        ;
    }
-
+   
+   /**
+    * findByName
+    * findByName and set the max returned results
+    * default is near infinity
+    *
+    * @param  mixed $value
+    * @param  mixed $max
+    * @return array
+    */
    public function findByName($value,$max=999999999): array
    {
        return $this->createQueryBuilder('p')
