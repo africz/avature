@@ -9,10 +9,15 @@ API calls:
 
 - new
 - update
+    - update full 
+    - partial update 
 - delete 
 - search
-
-
+    - search by multiply names 
+    - search by mulitply names and min salary required
+    - search by multiply names and multiply countries
+    - search by multiply names and multiply countries and minimum salary required
+    
 How to call these explained in Controllers Search and Position Controllers
 this is available as well in Docs folder.
 All invalid API calls return with 404 error page in production mode only
