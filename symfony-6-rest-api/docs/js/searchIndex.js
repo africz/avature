@@ -123,7 +123,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\App\\Controller\\SearchController\u003A\u003Asearch\u0028\u0029",
             "name": "search",
-            "summary": "search",
+            "summary": "search\nSearch\u0020by\u0020name\u0020multiply\u0020name\u0020allowed\u0020in\u0020an\u0020array",
             "url": "classes/App-Controller-SearchController.html#method_search"
         },                {
             "fqsen": "\\App\\Controller\\SearchController\u003A\u003AfetchExternalJobSource\u0028\u0029",
@@ -135,6 +135,11 @@ Search.appendIndex(
             "name": "fetchPositions",
             "summary": "fetchPositions\nRetrive\u0020positions\u0020from\u0020db",
             "url": "classes/App-Controller-SearchController.html#method_fetchPositions"
+        },                {
+            "fqsen": "\\App\\Controller\\SearchController\u003A\u003Afilter_search\u0028\u0029",
+            "name": "filter_search",
+            "summary": "filter_search\nremove\u0020those\u0020records\u0020that\u0020not\u0020match\u0020with\u0020given\u0020country\u0020or\u0020salary\u0020records",
+            "url": "classes/App-Controller-SearchController.html#method_filter_search"
         },                {
             "fqsen": "\\App\\Controller\\SearchController\u003A\u003Amerge_search\u0028\u0029",
             "name": "merge_search",
