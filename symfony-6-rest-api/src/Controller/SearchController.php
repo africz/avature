@@ -126,9 +126,13 @@ class SearchController extends BaseController {
 
                             private function fetchExternalJobSource( $name ): array {
                                 $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'name'=>$name ] );
+                                $eMethod = $this->getParameter( 'app.jobsource.method' );
+                                $eUrl = $this->getParameter( 'app.jobsource.url' );
+                                $this->log->debug( $this->getFunc( __FUNCTION__, __LINE__ ), [ 'method'=>$eMethod,'url'=>$eUrl ] );                                
+
                                 $response = $this->client->request(
-                                    'GET',
-                                    'http://localhost:8081/jobs?name='.$name
+                                    $eMethod,
+                                    $eUrl.$name
                                 );
 
                                 $statusCode = $response->getStatusCode();
@@ -160,7 +164,7 @@ class SearchController extends BaseController {
 
                             /**
                             * filter_search
-                            * remove those records that not match with given country or salary records 
+                            * remove those records that not match with given country or salary records
                             *
                             * @param  mixed $parameters
                             * @param  mixed $finalOutput
